@@ -1,88 +1,56 @@
-name: Testing & Production Push
+steps:
+  - uses: actions/checkout@v4
 
-on:
-  push:
-    branches: [main]
+  - name: Setup Node.js environment
+    uses: actions/setup-node@v4
+    with:
+      node-version: 24
 
-env:
-  REGISTRY: ghcr.io
+  - name: Install dependencies
+    run: |
+      npm i -g pnpm
+      # This flag tells pnpm to trust the packages without asking for approval
+      pnpm i --no-frozen-lockfile --only-allow-trusted-dependencies
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+  - name: Run Database Migrations and Generation
+    run: |
+      pnpm run prisma:generate
+    env:
+      DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
+      DATABASE_DIRECT_URL: 'postgresql://postgres:123@postgres:5432/postgres'
 
-    # Permissions required to publish packages to GHCR
-    permissions:
-      contents: read
-      packages: write
+  - name: Compile and Test Build
+    run: pnpm build
+    env:
+      DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
+      DATABASE_DIRECT_URL: 'postgresql://postgres:123@postgres:5432/postgres'
+      DEV_MODE: true
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: 'change me'
+      PORT: 80
+      MAX_CHANNELS_PER_SERVER: 100
+      MAX_INVITES_PER_SERVER: 10
+      MAX_ROLES_PER_SERVER: 50
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: 123
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+  # =========================================================
+  # NEW: Fix for the Uppercase Username & Docker Push
+  # =========================================================
+  - name: Log in to the Container registry
+    uses: docker/login-action@v3
+    with:
+      registry: ${{ env.REGISTRY }}
+      username: ${{ github.actor }}
+      password: ${{ secrets.GITHUB_TOKEN }}
 
-    steps:
-      - uses: actions/checkout@v4
+  - name: Downcase Repository Name
+    run: |
+      echo "IMAGE_NAME_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: |
-          npm i -g pnpm
-          pnpm approve-builds
-          pnpm i --no-frozen-lockfile
-
-      - name: Run Database Migrations and Generation
-        run: |
-          pnpm run prisma:migrate_dev
-          pnpm run prisma:generate
-        env:
-          DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-          DATABASE_DIRECT_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-
-      - name: Compile and Test Build
-        run: pnpm build
-        env:
-          DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-          DATABASE_DIRECT_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-          DEV_MODE: true
-          REDIS_HOST: redis
-          REDIS_PORT: 6379
-          JWT_SECRET: 'change me'
-          PORT: 80
-          MAX_CHANNELS_PER_SERVER: 100
-          MAX_INVITES_PER_SERVER: 10
-          MAX_ROLES_PER_SERVER: 50
-
-      # =========================================================
-      # NEW: Authenticate and Publish Built Image to GHCR
-      # =========================================================
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Production Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+  - name: Build and push Production Docker image
+    uses: docker/build-push-action@v5
+    with:
+      context: .
+      push: true
+      # Using the lowercase name so Docker doesn't reject the tag
+      tags: ghcr.io/${{ env.IMAGE_NAME_LOWER }}:latest
