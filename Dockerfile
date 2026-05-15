@@ -5,17 +5,16 @@ WORKDIR /app
 # Install pnpm globally
 RUN npm install -g pnpm
 
-# Copy package manifests first to optimize cache layers
+# 1. Copy package files and the Prisma folder (Crucial!)
 COPY package.json pnpm-lock.yaml* ./
-COPY patches ./patches
+COPY prisma ./prisma/
 
-# This bypasses the interactive security prompt
-RUN pnpm install --no-frozen-lockfile --ignore-scripts
+# 2. Tell pnpm to allow scripts for the specific packages it's complaining about
+RUN pnpm config set allowed-hosts ghcr.io
+RUN pnpm install --no-frozen-lockfile
 
-# Then, if the app specifically needs scripts for certain packages, 
-# you can run them manually or tell pnpm it's okay:
+# 3. If it still blocks them, this command forces the approval of all current dependencies
 RUN pnpm approve-builds && pnpm install --no-frozen-lockfile
-RUN pnpm install
 
 # Copy application source files
 COPY . .
