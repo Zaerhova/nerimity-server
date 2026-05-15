@@ -47,6 +47,7 @@ jobs:
           npm i -g pnpm
           # We use an environment variable to bypass the security check 
           # instead of a command-line flag that might be "unknown"
+          pnpm approve-builds @firebase/util@1.15.0 @prisma/engines@7.7.0 bcrypt@6.0.0 bufferutil@4.1.0 esbuild@0.27.7 prisma@7.7.0 protobufjs@7.5.4 utf-8-validate@6.0.6
           pnpm i --no-frozen-lockfile
         env:
           PNPM_CONFIG_ONLY_BUILT_DEPENDENCIES_NONE: true
