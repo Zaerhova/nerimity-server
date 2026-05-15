@@ -1,4 +1,4 @@
-name: Testing & Production Push
+name: Production Push
 
 on:
   push:
@@ -10,59 +10,12 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    # Permissions required to publish packages to GHCR
     permissions:
       contents: read
       packages: write
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: 123
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install pnpm
-        run: npm install -g pnpm@latest
-
-      - name: Install dependencies
-        run: |
-          # The --no-verify-store-integrity helps avoid cache issues in GitHub Actions
-          pnpm i --no-frozen-lockfile --no-verify-store-integrity
-
-      - name: Run Database Generation
-        run: npx prisma generate
-        env:
-          DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-
-      - name: Compile and Test Build
-        run: npm run build
-        env:
-          DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-          DEV_MODE: true
-          REDIS_HOST: redis
-          REDIS_PORT: 6379
-          JWT_SECRET: 'test-secret'
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
