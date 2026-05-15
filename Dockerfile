@@ -11,7 +11,7 @@ COPY prisma ./prisma/
 
 # 2. Tell pnpm to allow scripts for the specific packages it's complaining about
 RUN pnpm config set allowed-hosts ghcr.io
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile --only-allow-trusted-dependencies
 
 # 3. If it still blocks them, this command forces the approval of all current dependencies
 RUN pnpm approve-builds && pnpm install --no-frozen-lockfile
