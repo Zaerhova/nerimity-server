@@ -43,41 +43,23 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: |
-          npm i -g pnpm
-          # We use an environment variable to bypass the security check 
-          # instead of a command-line flag that might be "unknown"
-          pnpm approve-builds --all
-          pnpm i --no-frozen-lockfile
-        env:
-          PNPM_CONFIG_ONLY_BUILT_DEPENDENCIES_NONE: true
+        # --legacy-peer-deps prevents "dependency conflict" errors common in Nerimity
+        run: npm install --legacy-peer-deps
 
-      - name: Run Database Migrations and Generation
-        run: |
-          # We generate the prisma client so the build doesn't fail
-          pnpm run prisma:generate
+      - name: Run Database Generation
+        run: npx prisma generate
         env:
           DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-          DATABASE_DIRECT_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-          PNPM_CONFIG_ONLY_BUILT_DEPENDENCIES_NONE: true
 
       - name: Compile and Test Build
-        run: pnpm build
+        run: npm run build
         env:
           DATABASE_URL: 'postgresql://postgres:123@postgres:5432/postgres'
-          DATABASE_DIRECT_URL: 'postgresql://postgres:123@postgres:5432/postgres'
           DEV_MODE: true
           REDIS_HOST: redis
           REDIS_PORT: 6379
-          JWT_SECRET: 'change me'
-          PORT: 80
-          MAX_CHANNELS_PER_SERVER: 100
-          MAX_INVITES_PER_SERVER: 10
-          MAX_ROLES_PER_SERVER: 50
+          JWT_SECRET: 'test-secret'
 
-      # =========================================================
-      # NEW: Fix for the Uppercase Username & Docker Push
-      # =========================================================
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
@@ -94,5 +76,4 @@ jobs:
         with:
           context: .
           push: true
-          # Using the lowercase name so Docker doesn't reject the tag
           tags: ghcr.io/${{ env.IMAGE_NAME_LOWER }}:latest
