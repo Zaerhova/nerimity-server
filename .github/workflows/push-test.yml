@@ -45,6 +45,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm i -g pnpm
+          pnpm approve-builds
           pnpm i --no-frozen-lockfile
 
       - name: Run Database Migrations and Generation
