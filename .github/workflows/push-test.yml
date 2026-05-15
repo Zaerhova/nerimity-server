@@ -42,9 +42,13 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install pnpm
+        run: npm install -g pnpm@latest
+
       - name: Install dependencies
-        # --legacy-peer-deps prevents "dependency conflict" errors common in Nerimity
-        run: npm install --legacy-peer-deps
+        run: |
+          # The --no-verify-store-integrity helps avoid cache issues in GitHub Actions
+          pnpm i --no-frozen-lockfile --no-verify-store-integrity
 
       - name: Run Database Generation
         run: npx prisma generate
