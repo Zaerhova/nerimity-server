@@ -101,7 +101,8 @@
       "esbuild",
       "protobufjs",
       "bufferutil",
-      "utf-8-validate"
+      "utf-8-validate",
+      "@firebase/util"
     ]
   }
 }
