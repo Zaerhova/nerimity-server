@@ -45,7 +45,6 @@ jobs:
       - name: Install dependencies
         run: |
           npm i -g pnpm
-          pnpm config set only-built-dependencies-none true 
           pnpm i --no-frozen-lockfile
 
       - name: Run Database Migrations and Generation
