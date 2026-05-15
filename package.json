@@ -92,5 +92,16 @@
   "optionalDependencies": {
     "bufferutil": "^4.1.0",
     "utf-8-validate": "^6.0.6"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt",
+      "prisma",
+      "@prisma/engines",
+      "esbuild",
+      "protobufjs",
+      "bufferutil",
+      "utf-8-validate"
+    ]
   }
 }
