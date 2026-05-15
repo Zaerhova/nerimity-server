@@ -6,7 +6,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # 1. Copy package files and the Prisma folder (Crucial!)
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* .npmrc ./
 COPY prisma ./prisma/
 
 # 2. Tell pnpm to allow scripts for the specific packages it's complaining about
