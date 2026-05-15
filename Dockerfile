@@ -17,8 +17,8 @@ RUN pnpm install --no-frozen-lockfile --ignore-scripts
 # 5. Copy the rest of the code
 COPY . .
 
-# 6. Generate Prisma Client (so the build doesn't fail)
-RUN pnpm run prisma:generate
+RUN DATABASE_URL="postgresql://user:pass@localhost:5432/db" pnpm run prisma:generate
+
 
 # 7. Build the project
 RUN pnpm run build
