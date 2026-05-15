@@ -10,10 +10,9 @@ COPY package.json pnpm-lock.yaml* ./
 
 # 3. Force pnpm to allow the build scripts for Prisma/Bcrypt
 # This configures it JUST for this container build
-RUN pnpm config set only-built-dependencies-none true
 
 # 4. Install dependencies
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # 5. Copy the rest of the code
 COPY . .
