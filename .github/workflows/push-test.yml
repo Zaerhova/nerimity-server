@@ -10,7 +10,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     # Permissions required to publish packages to GHCR
     permissions:
       contents: read
@@ -45,7 +45,8 @@ jobs:
       - name: Install dependencies
         run: |
           npm i -g pnpm
-          pnpm i
+          pnpm config set only-built-dependencies-none true 
+          pnpm i --no-frozen-lockfile
 
       - name: Run Database Migrations and Generation
         run: |
