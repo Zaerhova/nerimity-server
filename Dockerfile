@@ -23,3 +23,4 @@ EXPOSE 8000
 
 # Set default execution command
 CMD ["pnpm", "start"]
+#run
