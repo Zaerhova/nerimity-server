@@ -22,7 +22,7 @@ export async function turnstileVerify(token: string, remoteIp?: string): Promise
       method: 'POST',
       body: params,
     });
-
+    console.log('Turnstile verification response status:', res.status);
     if (!res.ok) {
       return false;
     }
