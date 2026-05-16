@@ -36,4 +36,4 @@ COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 8000
 
-CMD ["pnpm", "run", "start-dist-both"]
+CMD pnpm run start-dist-both
