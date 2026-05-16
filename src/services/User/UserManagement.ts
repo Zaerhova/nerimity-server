@@ -34,7 +34,6 @@ export async function sendEmailConfirmCode(userId: string) {
 
   const code = await updateAccountConfirmCode(userId);
 
-  console.log(code);
   if (env.DEV_MODE) {
     return [{ message: `DEV MODE: Email verify code: ${code}` }, null] as const;
   }
