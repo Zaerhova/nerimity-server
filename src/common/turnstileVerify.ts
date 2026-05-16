@@ -29,7 +29,7 @@ export async function turnstileVerify(token: string, remoteIp?: string): Promise
 
     const json = (await res.json()) as TurnstileResponse;
 
-    if (json.hostname !== 'geekuane.quest') {
+    if (json.hostname !== 'nerimity.geekuane.quest') {
       return false;
     }
 
