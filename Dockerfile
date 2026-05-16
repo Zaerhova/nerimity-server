@@ -31,6 +31,8 @@ WORKDIR /app
 
 RUN npm install -g pnpm@latest
 
+COPY --from=builder /app/prisma ./prisma
+
 # Only copy what is needed to run the app to keep it small
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
