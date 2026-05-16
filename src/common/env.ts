@@ -57,4 +57,5 @@ export default {
   OPTIMIZE_API_KEY: process.env.OPTIMIZE_API_KEY as string,
   TYPE: (process.argv.includes('--ws') ? 'ws' : 'api') as 'api' | 'ws',
   EXTERNAL_EMBED_SECRET: process.env.EXTERNAL_EMBED_SECRET as string,
+  REGISTRATION_ENABLED: process.env.REGISTRATION_ENABLED === 'true',
 };

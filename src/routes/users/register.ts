@@ -6,6 +6,7 @@ import { rateLimit } from '../../middleware/rateLimit';
 import { isEmailSuspended, isIpBanned } from '../../services/User/User';
 import { registerUser } from '../../services/UserAuthentication';
 import { hasBadWord } from '../../common/badWords';
+import env from '../../common/env';
 
 export function register(Router: Router) {
   Router.post(
@@ -33,6 +34,10 @@ interface Body {
 }
 
 async function route(req: Request, res: Response) {
+  if (env.REGISTRATION_ENABLED === false) {
+    return res.status(403).json(generateError('Registration is currently disabled.', 'username'));
+  }
+
   const body = req.body as Body;
 
   const validateError = customExpressValidatorResult(req);
