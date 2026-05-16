@@ -40,4 +40,4 @@ COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 8000
 
-CMD pnpm prisma migrate deploy && pnpm run start-dist-both
+CMD pnpm prisma migrate deploy --schema ./prisma/schema.prisma && pnpm run start-dist-both
