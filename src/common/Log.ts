@@ -34,7 +34,13 @@ const getDateAndTime = () => new Intl.DateTimeFormat('en-gb', { dateStyle: 'shor
 // const pid = !cluster.isPrimary ? `PID ${process.pid}` : 'Main';
 const pid = !cluster.isPrimary ? `W` : 'M';
 
-const type = () => (env.TYPE === 'api' ? 'API' : 'WS');
+const type = () => {
+  if (!env || !env.TYPE) {
+    // Fallback if the env module is still initializing
+    return process.argv.includes('--ws') ? 'WS' : 'API';
+  }
+  return env.TYPE === 'api' ? 'API' : 'WS';
+};
 
 export const Log = {
   info(...args: any) {
